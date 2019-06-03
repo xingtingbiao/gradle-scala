@@ -1,0 +1,64 @@
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java' //指定java插件
+apply plugin: 'scala' //指定scala插件
+
+buildscript {
+    repositories {
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+    }
+}
+apply plugin: 'com.github.johnrengelman.shadow'
+
+// 构建可执行 jar 包，运行依赖jar内容会直接打到 jar 里面
+shadowJar {
+    // 生成包的命名规则： baseName-version-classifier.jar
+    zip64 true
+//    baseName = 'test'
+//    version = '1.0.0'
+//    classifier = test
+//    manifest {
+//        attributes(
+//                'Main-Class': 'cn.xuexiyuan.client.Main'
+//        )
+//    }
+
+    // 排除配置文件
+    exclude('system.properties')
+    exclude('log4j.properties')
+
+    // 打包时排除指定的 jar 包
+//    dependencies {
+//        exclude(dependency('org.mongodb:mongo-java-driver:3.3.0'))
+//    }
+
+    // 将 build.gradle 打入到 jar 中, 方便查看依赖包版本
+    from("./"){
+        include 'build.gradle'
+    }
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    //由于国内可能无法正常访问maven中心库，这里就填写了两个基本上能正常访问的maven库地址
+    maven {
+        url 'http://maven.aliyun.com/nexus/content/groups/public/'
+    }
+    maven {
+        url 'https://maven.ibiblio.org/maven2/'
+    }
+}
+
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: '2.11.8' //添加scala基本库
+    testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.5' //添加scala测试相关的依赖
+    testCompile 'junit:junit:4.4'
+}
